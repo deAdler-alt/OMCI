@@ -18,12 +18,12 @@ import numpy as np
 from typing import Dict, Tuple, List
 import logging
 
-from ..core.body_model import BodyModel
-from ..core.sensor import Sensor, Hub
-from ..core.genotype import Genotype
-from ..models.energy_model import EnergyModel
-from ..models.propagation_model import PropagationModel
-from ..models.los_detector import LOSDetector
+from src.core.body_model import BodyModel
+from src.core.sensor import Sensor, Hub
+from src.core.genotype import Genotype
+from src.models.energy_model import EnergyModel
+from src.models.propagation_model import PropagationModel
+from src.models.los_detector import LOSDetector
 
 logger = logging.getLogger(__name__)
 
