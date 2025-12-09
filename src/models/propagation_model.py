@@ -77,18 +77,7 @@ class PropagationModel:
                          rng: np.random.Generator = None) -> float:
         """
         Oblicza straty propagacji (path loss) zgodnie z IEEE 802.15.6 CM3.
-        
-        Args:
-            distance: Odległość [m]
-            los_status: 'LOS' lub 'NLOS'
-            include_shadowing: Czy dodać losowe cieniowanie
-            rng: Generator liczb losowych
-        
-        Returns:
-            PL: Path loss [dB]
-        
-        Raises:
-            ValueError: Jeśli los_status jest niepoprawny
+        ...
         """
         if los_status not in ['LOS', 'NLOS']:
             raise ValueError(f"Invalid LOS status: {los_status}. Must be 'LOS' or 'NLOS'")
@@ -106,12 +95,13 @@ class PropagationModel:
         n = params['n']
         sigma = params['sigma']
         
-        # Zapobiegaj log10(0) dla bardzo małych odległości
-        if distance < self.d0:
-            distance = self.d0
+        # POPRAWKA: Zapobiegaj log10(0), ale nie spłaszczaj poniżej d0 (1m)
+        # Ustawiamy minimalną odległość na 1mm (0.001 m)
+        min_dist = 1e-3
+        dist_calc = max(distance, min_dist)
         
         # Path loss (deterministyczny)
-        PL_deterministic = PL_d0 + 10 * n * np.log10(distance / self.d0)
+        PL_deterministic = PL_d0 + 10 * n * np.log10(dist_calc / self.d0)
         
         # Shadowing (losowy składnik)
         if include_shadowing:
