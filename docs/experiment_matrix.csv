@@ -1,0 +1,48 @@
+# WBAN Optimization - Experiment Matrix
+# Generated: 2024
+# Total configurations: 23 (18 main + 5 power analysis)
+# Total runs: 1150 (23 × 50)
+
+Exp_ID,Category,Scenario,N_Sensors,P_TX_dBm,w_E,w_R,Weight_Label,Algorithm,N_Runs,Est_Time_min,Priority,Status
+E001,Main,S1,6,0.0,0.7,0.3,Energy-Priority,GA,50,15,HIGH,TODO
+E002,Main,S1,6,0.0,0.7,0.3,Energy-Priority,PSO,50,12,HIGH,TODO
+E003,Main,S1,6,0.0,0.5,0.5,Balanced,GA,50,15,HIGH,TODO
+E004,Main,S1,6,0.0,0.5,0.5,Balanced,PSO,50,12,HIGH,TODO
+E005,Main,S1,6,0.0,0.3,0.7,Reliability-Priority,GA,50,15,MEDIUM,TODO
+E006,Main,S1,6,0.0,0.3,0.7,Reliability-Priority,PSO,50,12,MEDIUM,TODO
+E007,Main,S2,15,-5.0,0.7,0.3,Energy-Priority,GA,50,25,HIGH,TODO
+E008,Main,S2,15,-5.0,0.7,0.3,Energy-Priority,PSO,50,20,HIGH,TODO
+E009,Main,S2,15,-5.0,0.5,0.5,Balanced,GA,50,25,HIGH,TODO
+E010,Main,S2,15,-5.0,0.5,0.5,Balanced,PSO,50,20,HIGH,TODO
+E011,Main,S2,15,-5.0,0.3,0.7,Reliability-Priority,GA,50,25,MEDIUM,TODO
+E012,Main,S2,15,-5.0,0.3,0.7,Reliability-Priority,PSO,50,20,MEDIUM,TODO
+E013,Main,S3,25,-10.0,0.7,0.3,Energy-Priority,GA,50,40,HIGH,TODO
+E014,Main,S3,25,-10.0,0.7,0.3,Energy-Priority,PSO,50,35,HIGH,TODO
+E015,Main,S3,25,-10.0,0.5,0.5,Balanced,GA,50,40,HIGH,TODO
+E016,Main,S3,25,-10.0,0.5,0.5,Balanced,PSO,50,35,HIGH,TODO
+E017,Main,S3,25,-10.0,0.3,0.7,Reliability-Priority,GA,50,40,MEDIUM,TODO
+E018,Main,S3,25,-10.0,0.3,0.7,Reliability-Priority,PSO,50,35,MEDIUM,TODO
+E019,PowerAnalysis,S2,15,-10.0,0.5,0.5,Balanced,PSO,50,20,LOW,TODO
+E020,PowerAnalysis,S2,15,-5.0,0.5,0.5,Balanced,PSO,50,20,LOW,TODO
+E021,PowerAnalysis,S2,15,0.0,0.5,0.5,Balanced,PSO,50,20,LOW,TODO
+E022,PowerAnalysis,S2,15,3.0,0.5,0.5,Balanced,PSO,50,20,LOW,TODO
+E023,PowerAnalysis,S2,15,5.0,0.5,0.5,Balanced,PSO,50,20,LOW,TODO
+
+# Summary Statistics:
+# - Main Experiment: 18 configs × 50 runs = 900 runs
+# - Power Analysis: 5 configs × 50 runs = 250 runs
+# - Total: 1150 runs
+# - Estimated total time: ~530 hours CPU time
+#   (With 4 cores: ~130 hours = 5-6 days wall-clock time)
+
+# Priority Explanation:
+# - HIGH: Core thesis results (GA vs PSO comparison)
+# - MEDIUM: Additional weight variants (for sensitivity analysis)
+# - LOW: Power analysis (supplementary results for Section 5.3)
+
+# Notes:
+# 1. Est_Time_min assumes ~18 sec per run (based on N_sensors complexity)
+# 2. For S1 (6 sensors): ~10 sec/run → 50 runs = ~8-10 min
+# 3. For S2 (15 sensors): ~25 sec/run → 50 runs = ~20-25 min
+# 4. For S3 (25 sensors): ~40-50 sec/run → 50 runs = ~35-40 min
+# 5. PSO typically 20% faster than GA (fewer fitness evaluations)
