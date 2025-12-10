@@ -43,13 +43,15 @@ class PSOOptimizer:
         """
         pso_config = config['optimization']['PSO']
         
-        self.pop_size = pso_config['pop_size']
-        self.n_iterations = pso_config['n_iterations']
-        self.c1 = pso_config['c1']
-        self.c2 = pso_config['c2']
-        self.w = pso_config['w']
-        self.w_min = pso_config.get('w_min', 0.4)
-        self.w_max = pso_config.get('w_max', 0.9)
+        self.pop_size = pso_config['population_size']
+        self.n_iterations = pso_config['max_iterations']
+
+        self.c1 = pso_config['cognitive_coefficient']
+        self.c2 = pso_config['social_coefficient']
+        self.w = pso_config['inertia_weight']
+
+        self.w_min = 0.4
+        self.w_max = 0.9
         
         # Model będzie utworzony w optimize()
         self.model = None

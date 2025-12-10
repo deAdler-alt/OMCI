@@ -42,11 +42,12 @@ class GAOptimizer:
         """
         ga_config = config['optimization']['GA']
         
-        self.pop_size = ga_config['pop_size']
-        self.n_generations = ga_config['n_generations']
-        self.pc = ga_config['p_c']
-        self.pm = ga_config['p_m']
-        self.tournament_size = ga_config.get('tournament_size', 3)
+        self.pop_size = ga_config['population_size']
+        self.n_generations = ga_config['max_iterations']
+
+        self.pc = ga_config['crossover']['probability']
+        self.pm = ga_config['mutation']['probability']
+        self.tournament_size = ga_config['selection']['tournament_size']
         
         # Model będzie utworzony w optimize()
         self.model = None
