@@ -1,531 +1,134 @@
 # ============================================================================
-# WBAN Sensor Placement Optimization - System Configuration
+# WBAN/IoMT Optimization Configuration - TOPOLOGICAL MODEL
 # ============================================================================
-# Autor: Kamil Piejko
-# Data: 2024
-# Źródła parametrów:
-#   [19] Deepak & Babu 2016 - Energy consumption analysis IEEE 802.15.6
-#   [11] Al-Mishmish et al. 2018 - Critical data transmission
-#   [13] Ajmi et al. 2021 - MWCSGA clustering
-#   [10] Alam & Ben Hamida 2014 - Sensors locations and mobility
+# Based on: "An Energy Aware Clustering Scheme for 5G-enabled Edge Computing based IoMT Framework"
 # ============================================================================
 
-# ----------------------------------------------------------------------------
-# 1. MODEL CIAŁA - STREFY ANATOMICZNE
-# ----------------------------------------------------------------------------
-# Układ współrzędnych: znormalizowany [0,1] × [0,1]
-# Oś X: szerokość ciała (lewa → prawa)
-# Oś Y: wysokość ciała (dół → góra)
-# Źródło: [10] Tabela 16 + logika anatomiczna
+# 1. PRZESTRZEŃ SYMULACJI (Szpital / Obszar IoMT)
+space:
+  dimensions: [500, 500]  # metry (500x500 m)
+  base_station:
+    position: [500, 500]  # Stacja bazowa w rogu (wg artykułu)
 
+# 2. MODEL CIAŁA (Uproszczony - tylko granice obszaru)
 body_model:
   zones:
-    # Tors (centrum)
-    chest:
-      x_range: [0.35, 0.65]
-      y_range: [0.50, 0.75]
-      description: "Klatka piersiowa - ECG, temperatura"
-    
-    # Głowa
-    head:
-      x_range: [0.40, 0.60]
-      y_range: [0.80, 0.95]
-      description: "Głowa - EEG, czujniki neurologiczne"
-    
-    # Ramiona
-    left_shoulder:
-      x_range: [0.20, 0.35]
-      y_range: [0.60, 0.75]
-      description: "Lewe ramię - SpO2, akcelerometr"
-    
-    right_shoulder:
-      x_range: [0.65, 0.80]
-      y_range: [0.60, 0.75]
-      description: "Prawe ramię - SpO2, akcelerometr"
-    
-    # Nadgarstki
-    left_wrist:
-      x_range: [0.10, 0.20]
-      y_range: [0.45, 0.55]
-      description: "Lewy nadgarstek - pulsoksymetr, temperatura"
-    
-    right_wrist:
-      x_range: [0.80, 0.90]
-      y_range: [0.45, 0.55]
-      description: "Prawy nadgarstek - pulsoksymetr"
-    
-    # Pas/biodro (typowa lokalizacja Hub)
-    waist:
-      x_range: [0.40, 0.60]
-      y_range: [0.40, 0.50]
-      description: "Pas/biodro - Hub, akcelerometr (detekcja upadków)"
-    
-    # Nogi
-    left_thigh:
-      x_range: [0.35, 0.48]
-      y_range: [0.20, 0.40]
-      description: "Lewe udo - czujniki ruchu"
-    
-    right_thigh:
-      x_range: [0.52, 0.65]
-      y_range: [0.20, 0.40]
-      description: "Prawe udo - czujniki ruchu"
-    
-    left_ankle:
-      x_range: [0.38, 0.45]
-      y_range: [0.05, 0.15]
-      description: "Lewa kostka - akcelerometr, żyroskop"
-    
-    right_ankle:
-      x_range: [0.55, 0.62]
-      y_range: [0.05, 0.15]
-      description: "Prawa kostka - akcelerometr, żyroskop"
-
-  # Parametry geometryczne modelu ciała (do NLOS detection)
+    # Definiujemy jedną strefę "body" jako cały obszar roboczy
+    # (Zachowujemy kompatybilność kodu, ale usuwamy restrykcje anatomiczne)
+    body:
+      x_range: [0.0, 1.0]
+      y_range: [0.0, 1.0]
+      description: "Obszar symulacji IoMT"
+  
   torso_cylinder:
-    center_x: 0.50
-    center_y: 0.60
-    radius: 0.15  # Średnica torsu w skali znormalizowanej
-    height_range: [0.40, 0.80]
+    # Wyłączamy wpływ ciała na propagację (w skali 500m jest pomijalny)
+    center_x: -100
+    center_y: -100
+    radius: 0.0
+    height_range: [0, 0]
 
-# ----------------------------------------------------------------------------
-# 2. TYPY SENSORÓW I ICH PRZYPISANIE DO STREF
-# ----------------------------------------------------------------------------
-# Źródło: [10] Tabela 16 - lokalizacje i mobilność
-
+# 3. TYPY SENSORÓW (Uproszczone - liczy się ilość danych)
 sensor_types:
-  ECG:
-    zone: chest
-    data_rate: 200  # bps
-    packet_size: 100  # bits
-    mobility: low
-    priority: high  # Krytyczne dane medyczne
-  
-  EEG:
-    zone: head
-    data_rate: 3000  # bps (wyższa częstotliwość próbkowania)
-    packet_size: 500
-    mobility: low
-    priority: high
-  
-  SpO2:
-    zone: [left_shoulder, right_shoulder, left_wrist]  # Elastyczne
-    data_rate: 50
-    packet_size: 50
-    mobility: medium
+  Generic:
+    zone: body
+    data_rate: 1000  # bps
+    packet_size: 4000 # bits (500 bajtów)
     priority: medium
-  
-  Temperature:
-    zone: [chest, left_wrist]
-    data_rate: 10
-    packet_size: 20
-    mobility: low
-    priority: low
-  
-  Accelerometer:
-    zone: [waist, left_shoulder, right_shoulder, left_thigh, right_thigh, left_ankle, right_ankle]
-    data_rate: 100
-    packet_size: 80
-    mobility: high
-    priority: medium
-  
-  Gyroscope:
-    zone: [left_ankle, right_ankle, left_thigh, right_thigh]
-    data_rate: 100
-    packet_size: 80
-    mobility: high
-    priority: medium
-  
-  Heart_Rate:
-    zone: [chest, left_wrist, right_wrist]
-    data_rate: 50
-    packet_size: 50
-    mobility: low
-    priority: high
 
-# ----------------------------------------------------------------------------
-# 3. PARAMETRY ENERGETYCZNE (First Order Radio Model)
-# ----------------------------------------------------------------------------
-# Źródła: [11] Al-Mishmish str. 12, [13] Ajmi Tabela 1
-# Wartości standardowe dla symulacji WBAN
-
-energy_model:
-  # Energia elektroniki (transceiver)
-  E_elec_TX: 50.0e-9  # J/bit (50 nJ/bit) - energia nadajnika
-  E_elec_RX: 50.0e-9  # J/bit (50 nJ/bit) - energia odbiornika
-  
-  # Energia wzmacniacza (amplifier)
-  E_amp_fs: 10.0e-12  # J/bit/m² (10 pJ/bit/m²) - Free Space (d²)
-  E_amp_mp: 0.0013e-12  # J/bit/m⁴ (0.0013 pJ/bit/m⁴) - Multipath (d⁴)
-  
-  # Energia agregacji danych
-  E_da: 5.0e-9  # J/bit/signal (5 nJ/bit) - data aggregation
-  
-  # Początkowa energia baterii
-  E_init: 0.5  # J (0.5 Joule) - typowa bateria dla węzła WBAN
-  
-  # Próg odległości dla modelu Free Space vs. Multipath
-  d_threshold: 0.5  # m (jeśli d < d_threshold → Free Space, inaczej Multipath)
-  
-  # Notka: Alternatywnie dla sprzętowego modelu Nordic nRF24L01+:
-  # E_elec_TX = E_elec_RX = 11.25 nJ/bit (z [19] Tabela 7)
-
-# ----------------------------------------------------------------------------
-# 4. PARAMETRY PROPAGACJI (IEEE 802.15.6 CM3 - On-Body Channel)
-# ----------------------------------------------------------------------------
-# Źródło: [19] Deepak & Babu 2016, Tabela 6 (2.4 GHz)
-
-propagation_model:
-  frequency: 2.4e9  # Hz (2.4 GHz - pasmo ISM)
-  
-  # Parametry LOS (Line of Sight)
-  LOS:
-    path_loss_exponent: 3.11  # n_LOS
-    shadowing_std: 6.1  # dB (sigma_LOS)
-    PL_d0: 35.2  # dB - path loss at reference distance (d0 = 1m)
-  
-  # Parametry NLOS (Non-Line of Sight)
-  NLOS:
-    path_loss_exponent: 5.9  # n_NLOS
-    shadowing_std: 5.0  # dB (sigma_NLOS)
-    PL_d0: 48.4  # dB - path loss at reference distance
-  
-  # Parametry dodatkowe
-  d0: 1.0  # m - odległość referencyjna
-  body_shadowing_extra: 10.0  # dB - dodatkowe tłumienie ciała ([10] Januszkiewicz)
-  
-  # Odbiornik
-  receiver_sensitivity: -85.0  # dBm (P_sens) - czułość odbiornika
-  noise_figure: 10.0  # dB
-  
-  # Margines bezpieczeństwa
-  link_margin: 10.0  # dB (M_safe) - margines dla niezawodności
-
-# ----------------------------------------------------------------------------
-# 5. SCENARIUSZE EKSPERYMENTALNE
-# ----------------------------------------------------------------------------
-# Uzasadnienie: Inverse Power Scheme
-# - S1 (rzadki): Duże odległości → wysoka moc dla pokonania body shadowing
-# - S2 (balanced): Średnie parametry
-# - S3 (gęsty): Krótkie odległości → niska moc dla oszczędności i redukcji interferencji
-
+# 4. SCENARIUSZE (Skalowalność)
 scenarios:
   S1:
-    name: "Sparse/Robust - Basic Monitoring"
-    n_sensors: 6
-    P_TX_max: 0.0  # dBm (1 mW)
-    description: "Podstawowe monitorowanie (ECG, SpO2, temperatura). Duże odległości wymagają wyższej mocy."
-    sensor_config:
-      - {type: ECG, zone: chest}
-      - {type: SpO2, zone: left_wrist}
-      - {type: Temperature, zone: chest}
-      - {type: Heart_Rate, zone: right_wrist}
-      - {type: Accelerometer, zone: waist}
-      - {type: Gyroscope, zone: left_ankle}
+    name: "Small Scale (WBAN)"
+    n_sensors: 10
+    n_hubs: 1
+    P_TX_max: 0.0
+    sensor_config: # Lista generowana dynamicznie w kodzie lub powtórzona
+      - {type: Generic, zone: body} # x10
   
   S2:
-    name: "Balanced/Advanced - Extended Monitoring"
-    n_sensors: 15
-    P_TX_max: -5.0  # dBm (0.316 mW)
-    description: "Rozszerzone monitorowanie z czujnikami ruchu. Balans między zasięgiem a energią."
+    name: "Medium Scale (Ward)"
+    n_sensors: 50
+    n_hubs: 3  # 3 klastry (Huby optymalizowane)
+    P_TX_max: 0.0
     sensor_config:
-      - {type: ECG, zone: chest}
-      - {type: EEG, zone: head}
-      - {type: SpO2, zone: left_shoulder}
-      - {type: SpO2, zone: right_wrist}
-      - {type: Temperature, zone: chest}
-      - {type: Temperature, zone: left_wrist}
-      - {type: Heart_Rate, zone: chest}
-      - {type: Accelerometer, zone: waist}
-      - {type: Accelerometer, zone: left_shoulder}
-      - {type: Accelerometer, zone: right_shoulder}
-      - {type: Accelerometer, zone: left_thigh}
-      - {type: Accelerometer, zone: right_thigh}
-      - {type: Gyroscope, zone: left_ankle}
-      - {type: Gyroscope, zone: right_ankle}
-      - {type: Gyroscope, zone: waist}
+      - {type: Generic, zone: body} # x50
   
   S3:
-    name: "Dense/Efficiency - Comprehensive Monitoring"
-    n_sensors: 25
-    P_TX_max: -10.0  # dBm (0.1 mW)
-    description: "Pełny monitoring + motion capture. Gęsta sieć pozwala na niską moc."
+    name: "Large Scale (Hospital)"
+    n_sensors: 100
+    n_hubs: 5  # 5 klastrów
+    P_TX_max: 0.0
     sensor_config:
-      # Core vitals
-      - {type: ECG, zone: chest}
-      - {type: EEG, zone: head}
-      - {type: SpO2, zone: left_shoulder}
-      - {type: SpO2, zone: right_shoulder}
-      - {type: SpO2, zone: left_wrist}
-      - {type: SpO2, zone: right_wrist}
-      - {type: Temperature, zone: chest}
-      - {type: Temperature, zone: left_wrist}
-      - {type: Heart_Rate, zone: chest}
-      - {type: Heart_Rate, zone: right_wrist}
-      # Motion sensors (body)
-      - {type: Accelerometer, zone: waist}
-      - {type: Accelerometer, zone: left_shoulder}
-      - {type: Accelerometer, zone: right_shoulder}
-      - {type: Accelerometer, zone: left_thigh}
-      - {type: Accelerometer, zone: right_thigh}
-      - {type: Accelerometer, zone: left_ankle}
-      - {type: Accelerometer, zone: right_ankle}
-      - {type: Gyroscope, zone: waist}
-      - {type: Gyroscope, zone: left_shoulder}
-      - {type: Gyroscope, zone: right_shoulder}
-      - {type: Gyroscope, zone: left_thigh}
-      - {type: Gyroscope, zone: right_thigh}
-      - {type: Gyroscope, zone: left_ankle}
-      - {type: Gyroscope, zone: right_ankle}
-      # Additional sensors
-      - {type: Accelerometer, zone: head}
-  
-  # Hub placement (wspólne dla wszystkich scenariuszy)
+      - {type: Generic, zone: body} # x100
+
   hub_placement:
-    preferred_zone: waist  # Typowa lokalizacja Hub
-    allow_optimization: true  # Czy Hub może być optymalizowany (true) czy stały (false)
+    preferred_zone: body
+    allow_optimization: true
 
-# ----------------------------------------------------------------------------
-# 6. ALGORYTMY OPTYMALIZACYJNE
-# ----------------------------------------------------------------------------
+# 5. MODEL ENERGETYCZNY (First Order Radio Model)
+# Parametry z artykułu (sekcja Experimental results)
+energy_model:
+  E_elec_TX: 50.0e-9   # 50 nJ/bit
+  E_elec_RX: 50.0e-9   # 50 nJ/bit
+  E_amp_fs: 10.0e-12   # 10 pJ/bit/m^2 (Free Space)
+  E_amp_mp: 0.0013e-12 # 0.0013 pJ/bit/m^4 (Multipath)
+  E_da: 5.0e-9         # 5 nJ/bit/signal (Agregacja danych)
+  E_init: 0.5          # 0.5 J (Energia początkowa)
+  d_threshold: 87.0    # sqrt(E_fs/E_mp) = sqrt(10/0.0013) ~ 87.7 m
 
+# 6. MODEL PROPAGACJI (Uproszczony dla skali makro)
+propagation_model:
+  frequency: 2.4e9
+  LOS:  {path_loss_exponent: 2.0, shadowing_std: 0.0, PL_d0: 0} # Free space
+  NLOS: {path_loss_exponent: 4.0, shadowing_std: 0.0, PL_d0: 0} # Multipath
+  d0: 1.0
+  receiver_sensitivity: -90.0
+  link_margin: 0.0
+
+# 7. FUNKCJA CELU (Czysta optymalizacja energetyczna)
+fitness_function:
+  weight_variants:
+    balanced: # Jedyny wariant potrzebny teraz
+      w_E: 1.0  # 100% wagi na energię całkowitą
+      w_R: 0.0
+      label: "Energy Optimization"
+
+  penalties:
+    zone_violation: 0.0      # WYŁĄCZONA KARA ŚMIERCI!
+    overlap_distance: 0.01   # 1% obszaru (np. 5m w skali 500m)
+    overlap_penalty: 1000.0  # Kara za kolizję (nakładanie się węzłów)
+    link_margin_threshold: 0.0
+    reliability_penalty_factor: 0.0
+
+# 8. ALGORYTMY
 optimization:
-  # Genetic Algorithm (GA)
   GA:
     population_size: 50
     max_iterations: 100
-    
-    # Operatory genetyczne
-    crossover:
-      type: "arithmetic"  # Krzyżowanie arytmetyczne dla wartości ciągłych
-      probability: 0.8  # p_c
-    
-    mutation:
-      type: "gaussian"  # Mutacja gaussowska
-      probability: 0.1  # p_m
-      sigma: 0.05  # Odchylenie standardowe dla mutacji
-    
-    selection:
-      type: "tournament"
-      tournament_size: 3
-    
-    elitism:
-      enabled: true
-      elite_count: 2  # Liczba najlepszych osobników zachowywanych
+    crossover: {type: "uniform", probability: 0.9}
+    mutation: {type: "gaussian", probability: 0.1}
+    selection: {type: "tournament", tournament_size: 3}
+    elitism: {enabled: true, elite_count: 2}
   
-  # Particle Swarm Optimization (PSO)
   PSO:
     population_size: 50
     max_iterations: 100
-    
-    # Parametry PSO
-    inertia_weight: 0.7  # w
-    cognitive_coefficient: 1.5  # c1
-    social_coefficient: 1.5  # c2
-    
-    # Topology
-    topology: "global"  # Wszystkie cząstki komunikują się ze sobą
-    
-    # Velocity clamping
-    v_max: 0.2  # Maksymalna prędkość (20% zakresu)
-  
-  # Testy wrażliwości parametrów (Sekcja 5.3)
-  sensitivity_analysis:
-    PSO_inertia: [0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    GA_crossover: [0.6, 0.7, 0.8, 0.9]
-    GA_mutation: [0.05, 0.1, 0.15, 0.2]
+    inertia_weight: 0.7
+    cognitive_coefficient: 1.5
+    social_coefficient: 1.5
 
-# ----------------------------------------------------------------------------
-# 7. FUNKCJA CELU (Multi-Objective Fitness)
-# ----------------------------------------------------------------------------
-# F(g) = w_E × E_total(g) + w_R × P_rel(g) + P_geo(g)
-
-fitness_function:
-  # Wagi dla różnych priorytetów
-  weight_variants:
-    energy_priority:
-      w_E: 0.7
-      w_R: 0.3
-      label: "Energy-Priority"
-      description: "Priorytet: minimalizacja zużycia energii (monitoring długoterminowy)"
-    
-    balanced:
-      w_E: 0.5
-      w_R: 0.5
-      label: "Balanced"
-      description: "Balans między energią a niezawodnością"
-    
-    reliability_priority:
-      w_E: 0.3
-      w_R: 0.7
-      label: "Reliability-Priority"
-      description: "Priorytet: niezawodność transmisji (aplikacje krytyczne)"
-  
-  # Parametry kar geometrycznych
-  penalties:
-    zone_violation: 1.0e6  # Ogromna kara - rozwiązanie niedopuszczalne
-    overlap_distance: 0.05  # Minimalna odległość między sensorami (m w skali znormalizowanej)
-    overlap_penalty: 1.0e5
-    
-    # Kara za słaby margines łącza
-    link_margin_threshold: 0.0  # dB (jeśli M < 0 → kara)
-    reliability_penalty_factor: 100.0  # Współczynnik kary |M| × factor
-
-# ----------------------------------------------------------------------------
-# 8. EKSPERYMENTY
-# ----------------------------------------------------------------------------
+# ... (reszta pliku wyżej) ...
 
 experiments:
-  # Główny eksperyment (stała moc dla każdego scenariusza)
   main_experiment:
     scenarios: [S1, S2, S3]
-    weight_variants: [energy_priority, balanced, reliability_priority]
+    weight_variants: [balanced]
     algorithms: [GA, PSO]
-    n_runs: 50  # Niezależnych uruchomień dla każdej konfiguracji
-    random_seeds: auto  # Automatyczne generowanie seedów (42, 43, ..., 91)
-    
-    # Liczba konfiguracji: 3 × 3 × 2 = 18
-  
-  # Dodatkowy eksperyment: Power Analysis
+    n_runs: 30 # Wystarczy 30 do statystyki
+
   power_analysis:
-    scenario: S2  # Balanced jako baseline
+    scenario: S2              # Testujemy na średnim scenariuszu (50 sensorów)
+    algorithm: PSO            # PSO jest szybsze/lepsze
     weight_variant: balanced
-    algorithm: PSO  # Szybszy algorytm
-    P_TX_range: [-10.0, -5.0, 0.0, 3.0, 5.0]  # dBm
-    n_runs: 50
-    
-    # Liczba konfiguracji: 5
-  
-  # Łącznie: 18 + 5 = 23 konfiguracje × 50 runs = 1150 eksperymentów
-  
-  # Baseline methods (dla porównania)
-  baselines:
-    random_placement:
-      enabled: true
-      n_runs: 50
-      description: "Losowe rozmieszczenie sensorów w strefach"
-    
-    naive_centroid:
-      enabled: true
-      n_runs: 1  # Deterministyczny
-      description: "Sensory w centrach stref, Hub w centrum torsu"
-
-# ----------------------------------------------------------------------------
-# 9. METRYKI EWALUACYJNE
-# ----------------------------------------------------------------------------
-
-metrics:
-  primary:
-    - fitness_value  # F(g) - wartość funkcji celu
-    - total_energy  # E_total - całkowita energia [J]
-    - network_lifetime  # T_life - czas życia sieci [rounds do FND]
-    - min_link_margin  # M_min - minimalny margines łącza [dB]
-  
-  secondary:
-    - throughput  # Przepustowość [packets/round]
-    - propagation_delay  # Średnie opóźnienie [ms]
-    - energy_per_round  # Energia na rundę [mJ]
-    - packet_loss_rate  # Strata pakietów [%]
-    - LOS_ratio  # Stosunek łączy LOS do NLOS
-  
-  convergence:
-    - best_fitness_per_iteration  # Krzywa zbieżności
-    - diversity_per_iteration  # Różnorodność populacji
-
-# ----------------------------------------------------------------------------
-# 10. WIZUALIZACJE
-# ----------------------------------------------------------------------------
-
-visualizations:
-  required_plots:
-    - name: "energy_vs_sensors"
-      type: "line_plot"
-      x_axis: "Number of Sensors"
-      y_axis: "Total Energy [mJ]"
-      compare: [GA, PSO, Random]
-      error_bars: true  # ±1 std dev
-    
-    - name: "lifetime_vs_sensors"
-      type: "line_plot"
-      x_axis: "Number of Sensors"
-      y_axis: "Network Lifetime [rounds]"
-      compare: [GA, PSO, Random]
-      error_bars: true
-    
-    - name: "convergence_curves"
-      type: "line_plot"
-      x_axis: "Iteration"
-      y_axis: "Best Fitness (log scale)"
-      compare: [GA, PSO]
-      ribbon: true  # ±1 std ribbon
-      scenario: "S2_balanced"
-    
-    - name: "placement_visualization"
-      type: "scatter_plot"
-      description: "Najlepsze rozwiązanie na modelu ciała"
-      elements:
-        - sensors: circles
-        - hub: star
-        - links: lines (green=LOS, red=NLOS)
-        - zones: background contours
-    
-    - name: "energy_distribution"
-      type: "bar_chart"
-      x_axis: "Sensor ID"
-      y_axis: "Energy [mJ]"
-      add_mean_line: true
-    
-    - name: "propagation_delay_vs_sensors"
-      type: "line_plot"
-      x_axis: "Number of Sensors"
-      y_axis: "Propagation Delay [ms]"
-      compare: [GA, PSO]
-    
-    - name: "power_sensitivity"
-      type: "box_plot"
-      x_axis: "P_TX [dBm]"
-      y_axis: "Best Fitness"
-      data: "power_analysis results"
-
-# ----------------------------------------------------------------------------
-# 11. PARAMETRY TECHNICZNE SYMULACJI
-# ----------------------------------------------------------------------------
-
-simulation:
-  # Model symulacji
-  communication_model: "time_slot"  # Komunikacja w rundach (time slots)
-  round_duration: 1.0  # s - czas trwania rundy
-  simulation_time: 10000  # rounds - maksymalny czas symulacji
-  
-  # Kryteria zakończenia
-  termination:
-    first_node_dies: true  # FND (First Node Dies)
-    all_nodes_die: false  # AND (All Nodes Die) - nie używamy
-    min_energy_threshold: 0.01  # J - minimalny próg energii
-  
-  # Parametry numeryczne
-  numerical:
-    coordinate_precision: 1e-6  # Precyzja współrzędnych
-    energy_precision: 1e-12  # Precyzja obliczeń energii (picojoule)
-    convergence_tolerance: 1e-8  # Tolerancja dla zbieżności algorytmu
-
-# ----------------------------------------------------------------------------
-# 12. ŚCIEŻKI WYJŚCIOWE
-# ----------------------------------------------------------------------------
-
-output:
-  base_dir: "./results"
-  subdirs:
-    experiments: "experiments"
-    visualizations: "plots"
-    statistics: "statistics"
-    logs: "logs"
-  
-  file_formats:
-    results: "csv"
-    plots: "png"  # lub "pdf" dla publikacji
-    config_snapshot: "yaml"
-
-# ============================================================================
-# KONIEC KONFIGURACJI
-# ============================================================================
+    P_TX_range: [-10.0, -5.0, 0.0, 5.0, 10.0] # Zakres mocy do przetestowania (dBm)
+    n_runs: 30

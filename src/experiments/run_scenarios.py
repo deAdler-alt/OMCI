@@ -3,11 +3,8 @@ WBAN Optimization - Main Scenarios Pipeline
 Author: Kamil Piejko
 Date: 2024
 
-Pipeline do uruchomienia głównych eksperymentów:
-- 3 scenariusze (S1, S2, S3)
-- 3 warianty wag (energy, balanced, reliability)
-- 2 algorytmy (GA, PSO)
-= 18 konfiguracji × 50 runs = 900 eksperymentów
+Pipeline do uruchomienia głównych eksperymentów.
+Wersja zaktualizowana: Dynamiczne wczytywanie wariantów wag.
 """
 
 import numpy as np
@@ -21,17 +18,15 @@ from tqdm import tqdm
 import multiprocessing as mp
 from functools import partial
 
+# Import na górze pliku (niezbędne dla multiprocessing)
 from src.experiments.single_run import run_single_experiment
 
 logger = logging.getLogger(__name__)
 
 
-#NOWA FUNKCJA
-
 def proxy_single_run(run_id, config, scenario_name, algorithm_name, weight_variant):
     """
-    Wrapper dla multiprocessingu. Przyjmuje run_id jako pierwszy argument,
-    co pozwala uniknąć konfliktu z partial.
+    Wrapper dla multiprocessingu.
     """
     return run_single_experiment(
         config=config,
@@ -40,6 +35,7 @@ def proxy_single_run(run_id, config, scenario_name, algorithm_name, weight_varia
         weight_variant=weight_variant,
         run_id=run_id
     )
+
 
 def run_single_config(
     config: Dict,
@@ -53,21 +49,7 @@ def run_single_config(
 ) -> pd.DataFrame:
     """
     Uruchamia wszystkie runs dla jednej konfiguracji.
-    
-    Args:
-        config: Konfiguracja z YAML
-        scenario_name: Nazwa scenariusza
-        algorithm_name: Nazwa algorytmu
-        weight_variant: Wariant wag
-        n_runs: Liczba uruchomień
-        output_dir: Katalog wynikowy
-        parallel: Czy uruchomić równolegle
-        n_jobs: Liczba procesów
-    
-    Returns:
-        df_results: DataFrame z wynikami wszystkich runs
     """
-    
     config_name = f"{scenario_name}_{algorithm_name}_{weight_variant}"
     logger.info(f"Running configuration: {config_name} ({n_runs} runs)")
     
@@ -84,6 +66,7 @@ def run_single_config(
         )
         
         with mp.Pool(processes=n_jobs) as pool:
+            # imap jest leniwy, więc list() wymusza wykonanie
             results_list = list(tqdm(
                 pool.imap(run_func, range(1, n_runs + 1)),
                 total=n_runs,
@@ -105,17 +88,13 @@ def run_single_config(
     # Konwersja do DataFrame
     df_results = pd.DataFrame(results_list)
     
-    # Usuń kolumny niepotrzebne dla CSV (convergence_curve, best_genome)
-    #df_csv = df_results.drop(columns=['convergence_curve', 'best_genome'], errors='ignore')
-    df_csv = df_results  # Zapisujemy wszystko
-
-    # Zapisz wyniki
+    # Zapisz wyniki (tymczasowe pliki dla bezpieczeństwa)
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
     
+    # Nie usuwamy kolumn - zachowujemy dane do wykresów
     csv_file = output_path / f"{config_name}.csv"
-    df_csv.to_csv(csv_file, index=False)
-    logger.info(f"Saved results to {csv_file}")
+    df_results.to_csv(csv_file, index=False)
     
     return df_results
 
@@ -128,78 +107,77 @@ def run_all_scenarios(
     n_jobs: int = 4
 ) -> pd.DataFrame:
     """
-    Uruchamia wszystkie główne scenariusze eksperymentów.
-    
-    18 konfiguracji × 50 runs = 900 eksperymentów
-    
-    Args:
-        config_path: Ścieżka do konfiguracji
-        n_runs: Liczba uruchomień na konfigurację
-        output_dir: Katalog wynikowy
-        parallel: Równoległe wykonanie
-        n_jobs: Liczba procesów
-    
-    Returns:
-        df_all: DataFrame ze wszystkimi wynikami
+    Uruchamia wszystkie zdefiniowane scenariusze.
     """
     import sys
     from pathlib import Path
     
-    # Add project root to path
+    # Add project root to path if needed
     project_root = Path(__file__).resolve().parents[1]
     if str(project_root) not in sys.path:
         sys.path.insert(0, str(project_root))
     
     from src.utils.config_loader import load_config
     
-    logger.info("="*60)
-    logger.info("MAIN SCENARIOS PIPELINE")
-    logger.info("="*60)
-    logger.info(f"Configurations: 18")
-    logger.info(f"Runs per config: {n_runs}")
-    logger.info(f"Total experiments: {18 * n_runs}")
-    logger.info(f"Parallel: {parallel} (jobs={n_jobs})")
-    logger.info(f"Output: {output_dir}")
-    logger.info("="*60)
-    
     # Wczytaj konfigurację
     config = load_config(config_path)
     
-    # Definicje konfiguracji
+    # --- DYNAMICZNE POBIERANIE KONFIGURACJI ---
     scenarios = ['S1', 'S2', 'S3']
     algorithms = ['GA', 'PSO']
-    weight_variants = ['energy_priority', 'balanced', 'reliability_priority']
     
-    all_results = []
+    # Pobieramy klucze z configu, zamiast wpisywać na sztywno
+    # Dzięki temu skrypt sam "zauważy", że jest tylko 'balanced'
+    weight_variants = list(config['fitness_function']['weight_variants'].keys())
+    
     total_configs = len(scenarios) * len(algorithms) * len(weight_variants)
     
+    logger.info("="*60)
+    logger.info("MAIN SCENARIOS PIPELINE")
+    logger.info("="*60)
+    logger.info(f"Configurations: {total_configs}")
+    logger.info(f"Scenarios: {scenarios}")
+    logger.info(f"Variants: {weight_variants}")
+    logger.info(f"Runs per config: {n_runs}")
+    logger.info(f"Output: {output_dir}")
+    logger.info("="*60)
+    
+    all_results = []
     start_time = time.time()
     
-    for i, (scenario, algorithm, weight) in enumerate(
-        [(s, a, w) for s in scenarios for a in algorithms for w in weight_variants], 
-        1
-    ):
-        logger.info(f"\n[{i}/{total_configs}] Running: {scenario}, {algorithm}, {weight}")
-        
-        df_config = run_single_config(
-            config=config,
-            scenario_name=scenario,
-            algorithm_name=algorithm,
-            weight_variant=weight,
-            n_runs=n_runs,
-            output_dir=output_dir,
-            parallel=parallel,
-            n_jobs=n_jobs
-        )
-        
-        all_results.append(df_config)
+    counter = 1
+    for scenario in scenarios:
+        for weight in weight_variants:
+            for algorithm in algorithms:
+                logger.info(f"\n[{counter}/{total_configs}] Running: {scenario}, {algorithm}, {weight}")
+                
+                try:
+                    df_config = run_single_config(
+                        config=config,
+                        scenario_name=scenario,
+                        algorithm_name=algorithm,
+                        weight_variant=weight,
+                        n_runs=n_runs,
+                        output_dir=output_dir,
+                        parallel=parallel,
+                        n_jobs=n_jobs
+                    )
+                    all_results.append(df_config)
+                except Exception as e:
+                    logger.error(f"Failed to run config {scenario}_{algorithm}_{weight}: {e}")
+                    # Kontynuuj mimo błędu (żeby nie stracić wszystkiego)
+                
+                counter += 1
     
+    if not all_results:
+        logger.error("No results generated!")
+        return pd.DataFrame()
+
     # Połącz wszystkie wyniki
     df_all = pd.concat(all_results, ignore_index=True)
     
-    # Zapisz zbiorczy plik
+    # Zapisz zbiorczy plik (z pełnymi danymi!)
     all_csv = Path(output_dir) / 'all_main_scenarios.csv'
-    #df_all_csv = df_all.drop(columns=['convergence_curve', 'best_genome'], errors='ignore') # ignorujmey
     df_all.to_csv(all_csv, index=False)
     
     elapsed_time = time.time() - start_time
@@ -209,7 +187,6 @@ def run_all_scenarios(
     logger.info("="*60)
     logger.info(f"Total experiments: {len(df_all)}")
     logger.info(f"Total time: {elapsed_time:.2f}s ({elapsed_time/3600:.2f}h)")
-    logger.info(f"Avg time per experiment: {elapsed_time/len(df_all):.2f}s")
     logger.info(f"Results saved to: {all_csv}")
     logger.info("="*60)
     
@@ -263,18 +240,22 @@ if __name__ == '__main__':
         n_jobs=args.jobs
     )
     
-    # Podstawowe statystyki
-    print("\n" + "="*60)
-    print("SUMMARY STATISTICS")
-    print("="*60)
-    
-    summary = df_results.groupby(['scenario', 'algorithm', 'weight_variant']).agg({
-        'best_fitness': ['mean', 'std', 'min', 'max'],
-        'network_lifetime': ['mean', 'std'],
-        'E_total': 'mean',
-        'elapsed_time': 'sum'
-    }).round(6)
-    
-    print(summary)
+    # Podstawowe statystyki (jeśli są wyniki)
+    if not df_results.empty:
+        print("\n" + "="*60)
+        print("SUMMARY STATISTICS")
+        print("="*60)
+        
+        try:
+            summary = df_results.groupby(['scenario', 'algorithm', 'weight_variant']).agg({
+                'best_fitness': ['mean', 'std', 'min', 'max'],
+                'network_lifetime': ['mean'],
+                'E_total': 'mean',
+                'elapsed_time': 'sum'
+            }).round(6)
+            
+            print(summary)
+        except Exception as e:
+            print(f"Could not generate summary table: {e}")
     
     print("\n✓ Pipeline complete!")
