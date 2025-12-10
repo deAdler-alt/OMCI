@@ -257,6 +257,7 @@ scenarios:
       - {type: SpO2, zone: left_shoulder}
       - {type: SpO2, zone: right_shoulder}
       - {type: SpO2, zone: left_wrist}
+      - {type: SpO2, zone: right_wrist}
       - {type: Temperature, zone: chest}
       - {type: Temperature, zone: left_wrist}
       - {type: Heart_Rate, zone: chest}

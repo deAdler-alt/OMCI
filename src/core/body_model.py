@@ -29,7 +29,22 @@ class BodyZone:
     x_range: Tuple[float, float]
     y_range: Tuple[float, float]
     description: str = ""
-    
+
+    #Dodana nowa metoda
+    def distance_to_boundary(self, x: float, y: float) -> float:
+        """
+        Oblicza minimalną odległość punktu od granic strefy.
+        Zwraca 0.0, jeśli punkt jest wewnątrz.
+        """
+        # Odległość w osi X
+        dx = max(self.x_range[0] - x, 0, x - self.x_range[1])
+        # Odległość w osi Y
+        dy = max(self.y_range[0] - y, 0, y - self.y_range[1])
+        
+        # Odległość euklidesowa
+        return np.sqrt(dx*dx + dy*dy)
+
+
     def contains_point(self, x: float, y: float) -> bool:
         """
         Sprawdza, czy punkt (x, y) leży w tej strefie.
@@ -85,6 +100,15 @@ class BodyModel:
         torso_params: Parametry cylindra torsu (dla LOS/NLOS)
     """
     
+    # W klasie BodyModel
+    def get_distance_to_zone(self, position: np.ndarray, zone_name: str) -> float:
+        """
+        Zwraca odległość pozycji od wskazanej strefy.
+        """
+        zone = self.get_zone(zone_name)
+        return zone.distance_to_boundary(position[0], position[1])
+
+
     def __init__(self, config: Dict):
         """
         Inicjalizacja modelu ciała z konfiguracji.

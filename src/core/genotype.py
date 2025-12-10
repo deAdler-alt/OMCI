@@ -235,16 +235,26 @@ class Genotype:
         
         penalty_params = config['fitness_function']['penalties']
 
+        # Rzutowanie na float (to co już naprawiłeś)
         zone_violation_penalty = float(penalty_params['zone_violation'])
         min_distance = float(penalty_params['overlap_distance'])
         overlap_penalty_factor = float(penalty_params['overlap_penalty'])
-        
+
+        #Gradientowa kara za odległość
+        # Parametr siły przyciągania do strefy
+        DISTANCE_WEIGHT = 1000.0 
+
         # Kara za sensory poza strefami
         for sensor in sensors:
-            if not body_model.is_valid_position(sensor.position, sensor.assigned_zone):
-                penalty += zone_violation_penalty
+            # Zamiast binarnego tak/nie, pytamy: "jak daleko jesteś?"
+            dist = body_model.get_distance_to_zone(sensor.position, sensor.assigned_zone)
+            
+            if dist > 0:
+                # Sensor jest poza strefą.
+                # Kara = Stała kara (za błąd) + Kara za odległość (im dalej, tym gorzej)
+                penalty += zone_violation_penalty + (dist * DISTANCE_WEIGHT)
         
-        # Kara za nakładanie się sensorów
+        # Kara za nakładanie się sensorów (to zostaje bez zmian)
         for i, s1 in enumerate(sensors):
             for s2 in sensors[i+1:]:
                 distance = np.linalg.norm(s1.position - s2.position)
