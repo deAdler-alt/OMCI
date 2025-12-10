@@ -1,0 +1,4 @@
+scenario,algorithm,weight_variant,run_id,seed,n_sensors,P_TX_max,w_E,w_R,best_fitness,n_evaluations,is_valid,validation_reason,E_total,min_link_margin,network_lifetime,los_count,nlos_count,los_ratio,elapsed_time
+S2,GA,balanced,1,1,15,-5.0,0.5,0.5,7001809.42285257,5000,False,Sensor 2 (EEG) poza strefą 'head',0.00015000069091877671,24.653124154596874,99995,10,5,0.6666666666666666,1.335453987121582
+S2,GA,balanced,2,2,15,-5.0,0.5,0.5,8002643.019187193,5000,False,Sensor 2 (EEG) poza strefą 'head',0.00015000129587619128,26.984045890478875,99995,10,5,0.6666666666666666,1.3448679447174072
+S2,GA,balanced,3,3,15,-5.0,0.5,0.5,8002154.468202521,5000,False,Sensor 4 (SpO2) poza strefą 'right_wrist',0.00015000109766559613,33.95981592268757,99995,0,15,0.0,1.3482868671417236

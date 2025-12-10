@@ -1,0 +1,4 @@
+scenario,algorithm,weight_variant,run_id,seed,n_sensors,P_TX_max,w_E,w_R,best_fitness,n_evaluations,is_valid,validation_reason,E_total,min_link_margin,network_lifetime,los_count,nlos_count,los_ratio,elapsed_time
+S1,GA,energy_priority,1,1,6,0.0,0.7,0.3,1000473.335143196,5000,False,Sensor 6 (Gyroscope) poza strefą 'left_ankle',6.0000498441393237e-05,40.01767854254399,99996,4,2,0.6666666666666666,0.4418947696685791
+S1,GA,energy_priority,2,2,6,0.0,0.7,0.3,1000742.7788899242,5000,False,Sensor 6 (Gyroscope) poza strefą 'left_ankle',6.0000503932219e-05,47.25457144953316,99996,3,3,0.5,0.43581318855285645
+S1,GA,energy_priority,3,3,6,0.0,0.7,0.3,1000173.474011564,5000,False,Sensor 2 (SpO2) poza strefą 'left_wrist',6.000033731498029e-05,34.78842273790707,99997,1,5,0.16666666666666666,0.4420931339263916

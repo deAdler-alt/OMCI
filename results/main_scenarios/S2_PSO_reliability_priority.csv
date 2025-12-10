@@ -1,0 +1,4 @@
+scenario,algorithm,weight_variant,run_id,seed,n_sensors,P_TX_max,w_E,w_R,best_fitness,n_evaluations,is_valid,validation_reason,E_total,min_link_margin,network_lifetime,los_count,nlos_count,los_ratio,elapsed_time
+S2,PSO,reliability_priority,1,1,15,-5.0,0.3,0.7,2000452.9046739792,5000,False,Sensor 8 (Accelerometer) poza strefą 'waist',0.000150000900123043,28.454896371857146,99995,9,6,0.6,1.21663498878479
+S2,PSO,reliability_priority,2,2,15,-5.0,0.3,0.7,3000424.101574219,5000,False,Sensor 2 (EEG) poza strefą 'head',0.00015000066012336736,28.57111719162998,99995,9,6,0.6,1.1868069171905518
+S2,PSO,reliability_priority,3,3,15,-5.0,0.3,0.7,2000057.3376722336,5000,False,Sensor 5 (Temperature) poza strefą 'chest',0.00015000131930254228,37.790162916098154,99995,8,7,0.5333333333333333,1.1836175918579102

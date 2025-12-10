@@ -1,0 +1,4 @@
+scenario,algorithm,weight_variant,run_id,seed,n_sensors,P_TX_max,w_E,w_R,best_fitness,n_evaluations,is_valid,validation_reason,E_total,min_link_margin,network_lifetime,los_count,nlos_count,los_ratio,elapsed_time
+S2,PSO,energy_priority,1,1,15,-5.0,0.7,0.3,1000304.1451773375,5000,False,Sensor 14 (Gyroscope) poza strefą 'right_ankle',0.00015000115568179065,38.35184063112277,99995,8,7,0.5333333333333333,1.188194990158081
+S2,PSO,energy_priority,2,2,15,-5.0,0.7,0.3,5000420.401570029,5000,False,Sensor 2 (EEG) poza strefą 'head',0.0001500012397114516,30.83863279193796,99995,7,8,0.4666666666666667,1.1829712390899658
+S2,PSO,energy_priority,3,3,15,-5.0,0.7,0.3,2000380.000584127,5000,False,Sensor 5 (Temperature) poza strefą 'chest',0.00015000103139497918,31.80687714116796,99996,7,8,0.4666666666666667,1.1898810863494873

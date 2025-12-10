@@ -1,0 +1,4 @@
+scenario,algorithm,weight_variant,run_id,seed,n_sensors,P_TX_max,w_E,w_R,best_fitness,n_evaluations,is_valid,validation_reason,E_total,min_link_margin,network_lifetime,los_count,nlos_count,los_ratio,elapsed_time
+S1,GA,balanced,1,1,6,0.0,0.5,0.5,1000007.1896523294,5000,False,Sensor 5 (Accelerometer) poza strefą 'waist',6.000005012594987e-05,40.16151758831365,99998,3,3,0.5,0.4325900077819824
+S1,GA,balanced,2,2,6,0.0,0.5,0.5,1000055.4090065974,5000,False,Sensor 2 (SpO2) poza strefą 'left_wrist',6.0000137194508515e-05,29.896080546149726,99997,3,3,0.5,0.4373178482055664
+S1,GA,balanced,3,3,6,0.0,0.5,0.5,1000061.9716599372,5000,False,Sensor 4 (Heart_Rate) poza strefą 'right_wrist',6.0000379854184126e-05,42.12722300864151,99995,4,2,0.6666666666666666,0.4320988655090332
