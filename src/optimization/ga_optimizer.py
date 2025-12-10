@@ -88,6 +88,14 @@ class GAOptimizer:
             "log_to": None  # Wyłącz wbudowane logowanie
         }
         
+        # Oblicz proporcję dla k_way (Mealpy wymaga float 0-1)
+        # Jeśli tournament_size=3 i pop_size=50, to k_way=0.06
+        k_way_ratio = self.tournament_size / self.pop_size
+        
+        # Zabezpieczenie, żeby nie wyjść poza zakres
+        if k_way_ratio <= 0 or k_way_ratio > 1.0:
+            k_way_ratio = 0.1  # Fallback do bezpiecznej wartości
+
         # Utwórz model GA
         self.model = GA.BaseGA(
             epoch=self.n_generations,
@@ -95,9 +103,7 @@ class GAOptimizer:
             pc=self.pc,
             pm=self.pm,
             selection="tournament",
-            k_way=self.tournament_size,
-            crossover="uniform",
-            mutation="uniform"
+            k_way=k_way_ratio,  
         )
         
         # Ustaw seed jeśli podany
