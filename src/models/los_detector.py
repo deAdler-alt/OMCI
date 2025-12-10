@@ -235,8 +235,8 @@ if __name__ == '__main__':
         (np.array([0.15, 0.50]), np.array([0.20, 0.52]), 'LOS', 
          "Oba poza cylindrem (left side), linia nie przecina"),
         
-        (np.array([0.45, 0.85]), np.array([0.50, 0.45]), 'LOS', 
-         "Sensor na głowie → Hub waist, pionowa linia przez środek (LOS w osi)"),
+        (np.array([0.45, 0.85]), np.array([0.50, 0.45]), 'NLOS', 
+         "Sensor na głowie → Hub waist, pionowa linia przechodzi przez tors (NLOS)"),
         
         (np.array([0.38, 0.25]), np.array([0.55, 0.30]), 'LOS', 
          "Sensory na nogach, poniżej cylindra torsu"),

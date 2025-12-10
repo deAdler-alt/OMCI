@@ -234,9 +234,10 @@ class Genotype:
         penalty = 0.0
         
         penalty_params = config['fitness_function']['penalties']
-        zone_violation_penalty = penalty_params['zone_violation']
-        min_distance = penalty_params['overlap_distance']
-        overlap_penalty_factor = penalty_params['overlap_penalty']
+
+        zone_violation_penalty = float(penalty_params['zone_violation'])
+        min_distance = float(penalty_params['overlap_distance'])
+        overlap_penalty_factor = float(penalty_params['overlap_penalty'])
         
         # Kara za sensory poza strefami
         for sensor in sensors:
