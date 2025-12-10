@@ -6,10 +6,11 @@ Date: 2024
 Wykres krzywych zbieżności GA i PSO.
 """
 
+import numpy as np
+import ast
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
 from pathlib import Path
 import json
 import logging
@@ -49,7 +50,7 @@ def plot_convergence_curves(
     
     # Jeśli convergence_curve to string (JSON), parsuj
     if 'convergence_curve' in df.columns and isinstance(df['convergence_curve'].iloc[0], str):
-        df['convergence_curve'] = df['convergence_curve'].apply(json.loads)
+        df['convergence_curve'] = df['convergence_curve'].apply(lambda x: eval(x) if isinstance(x, str) else x)
     
     # Wykres
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))

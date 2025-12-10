@@ -106,8 +106,9 @@ def run_single_config(
     df_results = pd.DataFrame(results_list)
     
     # Usuń kolumny niepotrzebne dla CSV (convergence_curve, best_genome)
-    df_csv = df_results.drop(columns=['convergence_curve', 'best_genome'], errors='ignore')
-    
+    #df_csv = df_results.drop(columns=['convergence_curve', 'best_genome'], errors='ignore')
+    df_csv = df_results  # Zapisujemy wszystko
+
     # Zapisz wyniki
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -198,8 +199,8 @@ def run_all_scenarios(
     
     # Zapisz zbiorczy plik
     all_csv = Path(output_dir) / 'all_main_scenarios.csv'
-    df_all_csv = df_all.drop(columns=['convergence_curve', 'best_genome'], errors='ignore')
-    df_all_csv.to_csv(all_csv, index=False)
+    #df_all_csv = df_all.drop(columns=['convergence_curve', 'best_genome'], errors='ignore') # ignorujmey
+    df_all.to_csv(all_csv, index=False)
     
     elapsed_time = time.time() - start_time
     

@@ -6,10 +6,11 @@ Date: 2024
 Wizualizacja rozmieszczenia sensorów na ciele z połączeniami LOS/NLOS.
 """
 
+import numpy as np
+import ast
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import numpy as np
 from pathlib import Path
 import json
 import logging
@@ -38,14 +39,16 @@ def plot_sensor_placement(
     
     logger.info(f"Generating sensor placement plot...")
     
-    # Dekoduj genotyp
+    # --- POPRAWKA KRYTYCZNA: Poprawna kolejność argumentów dla decode ---
+    # Sygnatura: decode(genome, sensor_config, body_model, energy_init, hub_config)
     sensors, hub = Genotype.decode(
         genome,
-        fitness_function.n_sensors,
-        fitness_function.sensor_config,
-        fitness_function.body_model,
-        fitness_function.hub_config
+        fitness_function.sensor_config,  # Lista konfiguracji (było n_sensors - błąd!)
+        fitness_function.body_model,     # Model ciała
+        fitness_function.energy_init,    # Energia początkowa (brakowało tego!)
+        fitness_function.hub_config      # Konfiguracja huba
     )
+    # --------------------------------------------------------------------
     
     # Ewaluacja szczegółowa (do informacji o LOS/NLOS)
     details = fitness_function.evaluate_detailed(genome)
@@ -196,14 +199,6 @@ def plot_best_placements_from_csv(
 ):
     """
     Generuje wykresy placement dla najlepszych rozwiązań z CSV.
-    
-    Args:
-        csv_path: Ścieżka do CSV z wynikami
-        config_path: Ścieżka do config
-        output_dir: Katalog wynikowy
-        scenarios: Lista scenariuszy
-        algorithms: Lista algorytmów
-        weight_variant: Wariant wag
     """
     import sys
     from pathlib import Path
@@ -227,10 +222,31 @@ def plot_best_placements_from_csv(
     # Wczytaj config
     config = load_config(config_path)
     
-    # Parsuj best_genome jeśli string
+    # --- POPRAWKA: Bezpieczna funkcja parsowania ---
+    def parse_genome(val):
+        if not isinstance(val, str):
+            return val
+        try:
+            # Próba 1: Standardowy ast
+            return ast.literal_eval(val)
+        except:
+            try:
+                # Próba 2: Obsługa formatu numpy string (np. "[1. 2. 3.]" - bez przecinków)
+                # Usuń znaki nowej linii i nadmiarowe spacje
+                clean_val = " ".join(val.split())
+                # Usuń nawiasy
+                clean_val = clean_val.replace('[', '').replace(']', '')
+                # Podziel po spacji i skonwertuj na float
+                return [float(x) for x in clean_val.split() if x]
+            except:
+                logger.warning(f"Failed to parse genome: {val[:50]}...")
+                return []
+
+    # Aplikuj parser
     if isinstance(df['best_genome'].iloc[0], str):
-        df['best_genome'] = df['best_genome'].apply(json.loads)
-    
+        df['best_genome'] = df['best_genome'].apply(parse_genome)
+    # -----------------------------------------------
+
     for scenario in scenarios:
         for algorithm in algorithms:
             # Znajdź najlepszy run
@@ -240,10 +256,13 @@ def plot_best_placements_from_csv(
                 logger.warning(f"No data for {scenario}, {algorithm}")
                 continue
             
+            # Znajdź wiersz z najlepszym fitness
             best_row = subset.loc[subset['best_fitness'].idxmin()]
+            
+            # Upewnij się, że mamy numpy array
             best_genome = np.array(best_row['best_genome'])
             
-            # Utwórz fitness function
+            # Utwórz fitness function (automatycznie wczyta parametry z config dla danego scenariusza)
             fitness_func = FitnessFunction(config, scenario, weight_variant)
             
             # Wygeneruj wykres

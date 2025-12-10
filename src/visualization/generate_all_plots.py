@@ -40,14 +40,14 @@ def generate_all_plots(
     if str(project_root) not in sys.path:
         sys.path.insert(0, str(project_root))
     
-    from visualization.plot_energy import plot_energy_vs_sensors
-    from visualization.plot_lifetime import plot_lifetime_comparison
-    from visualization.plot_convergence import plot_convergence_curves
-    from visualization.plot_placement import plot_best_placements_from_csv
-    from visualization.plot_power_sensitivity import (
+    from src.visualization.plot_energy import plot_energy_vs_sensors
+    from src.visualization.plot_lifetime import plot_lifetime_comparison
+    from src.visualization.plot_convergence import plot_convergence_curves
+    from src.visualization.plot_placement import plot_best_placements_from_csv
+    from src.visualization.plot_power_sensitivity import (
         plot_power_sensitivity, plot_power_correlation
     )
-    from visualization.plot_comparison import (
+    from src.visualization.plot_comparison import (
         plot_algorithm_comparison_table, plot_radar_comparison
     )
     
