@@ -24,6 +24,21 @@ from functools import partial
 logger = logging.getLogger(__name__)
 
 
+#NOWA FUNKCJA
+
+def proxy_single_run(run_id, config, scenario_name, algorithm_name, weight_variant):
+    """
+    Wrapper dla multiprocessingu. Przyjmuje run_id jako pierwszy argument,
+    co pozwala uniknąć konfliktu z partial.
+    """
+    return run_single_experiment(
+        config=config,
+        scenario_name=scenario_name,
+        algorithm_name=algorithm_name,
+        weight_variant=weight_variant,
+        run_id=run_id
+    )
+
 def run_single_config(
     config: Dict,
     scenario_name: str,
@@ -50,7 +65,7 @@ def run_single_config(
     Returns:
         df_results: DataFrame z wynikami wszystkich runs
     """
-    from experiments.single_run import run_single_experiment
+    from src.experiments.single_run import run_single_experiment
     
     config_name = f"{scenario_name}_{algorithm_name}_{weight_variant}"
     logger.info(f"Running configuration: {config_name} ({n_runs} runs)")
@@ -60,7 +75,7 @@ def run_single_config(
     if parallel:
         # Równoległe wykonanie
         run_func = partial(
-            run_single_experiment,
+            proxy_single_run,
             config=config,
             scenario_name=scenario_name,
             algorithm_name=algorithm_name,

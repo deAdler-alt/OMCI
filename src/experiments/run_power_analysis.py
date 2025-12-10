@@ -22,6 +22,17 @@ from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
+#NOWA FUNCKJA FIX
+
+def proxy_power_run(run_id, config, scenario_name, algorithm_name, weight_variant):
+    return run_single_experiment(
+        config=config,
+        scenario_name=scenario_name,
+        algorithm_name=algorithm_name,
+        weight_variant=weight_variant,
+        run_id=run_id
+    )
+
 
 def run_power_analysis(
     config_path: str = 'config/wban_params.yaml',
@@ -52,7 +63,7 @@ def run_power_analysis(
         sys.path.insert(0, str(project_root))
     
     from src.utils.config_loader import load_config
-    from experiments.single_run import run_single_experiment
+    from src.experiments.single_run import run_single_experiment
     from functools import partial
     import multiprocessing as mp
     
@@ -87,7 +98,7 @@ def run_power_analysis(
         # Uruchom runs dla tego poziomu mocy
         if parallel:
             run_func = partial(
-                run_single_experiment,
+                proxy_power_run,
                 config=config_modified,
                 scenario_name='S2',
                 algorithm_name='PSO',
