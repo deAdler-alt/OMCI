@@ -19,6 +19,10 @@ import logging
 import time
 from datetime import datetime
 from tqdm import tqdm
+from functools import partial
+import multiprocessing as mp
+
+from src.experiments.single_run import run_single_experiment
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +67,6 @@ def run_power_analysis(
         sys.path.insert(0, str(project_root))
     
     from src.utils.config_loader import load_config
-    from src.experiments.single_run import run_single_experiment
     from functools import partial
     import multiprocessing as mp
     

@@ -21,6 +21,8 @@ from tqdm import tqdm
 import multiprocessing as mp
 from functools import partial
 
+from src.experiments.single_run import run_single_experiment
+
 logger = logging.getLogger(__name__)
 
 
@@ -65,7 +67,6 @@ def run_single_config(
     Returns:
         df_results: DataFrame z wynikami wszystkich runs
     """
-    from src.experiments.single_run import run_single_experiment
     
     config_name = f"{scenario_name}_{algorithm_name}_{weight_variant}"
     logger.info(f"Running configuration: {config_name} ({n_runs} runs)")
