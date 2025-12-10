@@ -1,4 +1,0 @@
-scenario,algorithm,weight_variant,run_id,seed,n_sensors,P_TX_max,w_E,w_R,best_fitness,n_evaluations,is_valid,validation_reason,E_total,min_link_margin,network_lifetime,los_count,nlos_count,los_ratio,elapsed_time
-S1,PSO,reliability_priority,1,1,6,0.0,0.3,0.7,1.800007348803253e-05,5000,True,OK,6.000024496010844e-05,44.36057259225866,99998,4,2,0.6666666666666666,0.4239022731781006
-S1,PSO,reliability_priority,2,2,6,0.0,0.3,0.7,1.8000013310584548e-05,5000,True,OK,6.000004436861517e-05,31.908398515024167,99999,2,4,0.3333333333333333,0.4123959541320801
-S1,PSO,reliability_priority,3,3,6,0.0,0.3,0.7,1.8000056106467756e-05,5000,True,OK,6.000018702155919e-05,44.16329889224001,99998,0,6,0.0,0.4005928039550781

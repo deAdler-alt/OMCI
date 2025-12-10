@@ -1,4 +1,0 @@
-scenario,algorithm,weight_variant,run_id,seed,n_sensors,P_TX_max,w_E,w_R,best_fitness,n_evaluations,is_valid,validation_reason,E_total,min_link_margin,network_lifetime,los_count,nlos_count,los_ratio,elapsed_time
-S2,GA,reliability_priority,1,1,15,-5.0,0.3,0.7,7004723.511781702,5000,False,Sensor 1 (ECG) poza strefą 'chest',0.0001500013491923362,20.975827089857866,99995,6,9,0.4,1.291949987411499
-S2,GA,reliability_priority,2,2,15,-5.0,0.3,0.7,7006991.6938986005,5000,False,Sensor 1 (ECG) poza strefą 'chest',0.0001500006812425967,24.74429983293568,99996,10,5,0.6666666666666666,1.2894959449768066
-S2,GA,reliability_priority,3,3,15,-5.0,0.3,0.7,7007364.010726703,5000,False,Sensor 2 (EEG) poza strefą 'head',0.00015000085452968902,30.008560622022998,99996,7,8,0.4666666666666667,1.2879900932312012

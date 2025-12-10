@@ -1,4 +1,0 @@
-scenario,algorithm,weight_variant,run_id,seed,n_sensors,P_TX_max,w_E,w_R,best_fitness,n_evaluations,is_valid,validation_reason,E_total,min_link_margin,network_lifetime,los_count,nlos_count,los_ratio,elapsed_time
-S1,GA,reliability_priority,1,1,6,0.0,0.3,0.7,1000045.7584851349,5000,False,Sensor 5 (Accelerometer) poza strefą 'waist',6.0000362352126184e-05,38.49634224194423,99996,3,3,0.5,0.43328309059143066
-S1,GA,reliability_priority,2,2,6,0.0,0.3,0.7,1000318.3846806431,5000,False,Sensor 6 (Gyroscope) poza strefą 'left_ankle',6.000029201022471e-05,36.617929674253304,99996,4,2,0.6666666666666666,0.4315612316131592
-S1,GA,reliability_priority,3,3,6,0.0,0.3,0.7,1000042.6767236786,5000,False,Sensor 3 (Temperature) poza strefą 'chest',6.000044983367802e-05,30.713871039453764,99995,2,4,0.3333333333333333,0.43366408348083496

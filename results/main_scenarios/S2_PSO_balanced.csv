@@ -1,4 +1,0 @@
-scenario,algorithm,weight_variant,run_id,seed,n_sensors,P_TX_max,w_E,w_R,best_fitness,n_evaluations,is_valid,validation_reason,E_total,min_link_margin,network_lifetime,los_count,nlos_count,los_ratio,elapsed_time
-S2,PSO,balanced,1,1,15,-5.0,0.5,0.5,2000514.7132812878,5000,False,Sensor 13 (Gyroscope) poza strefą 'left_ankle',0.0001500012539922405,39.834106347502754,99995,8,7,0.5333333333333333,1.1870357990264893
-S2,PSO,balanced,2,2,15,-5.0,0.5,0.5,2000243.7806282784,5000,False,Sensor 11 (Accelerometer) poza strefą 'left_thigh',0.0001500014022129451,28.071179940341523,99995,11,4,0.7333333333333333,1.2176861763000488
-S2,PSO,balanced,3,3,15,-5.0,0.5,0.5,3000411.2856418006,5000,False,Sensor 1 (ECG) poza strefą 'chest',0.00015000104348870857,24.540352872742027,99995,10,5,0.6666666666666666,1.1814332008361816
